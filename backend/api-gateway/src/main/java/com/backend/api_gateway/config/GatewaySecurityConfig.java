@@ -1,7 +1,6 @@
 package com.backend.api_gateway.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -29,11 +28,11 @@ public class GatewaySecurityConfig {
                         .pathMatchers(
                                 "/api/signup/**",
                                 "/api/signin/**",
-                                "/api/oauth/exchange",
+                                "/api/oauth-signin",
+                                "/api/oauth-signup",
                                 "/oauth2/**",
                                 "/login/**"
                         ).permitAll()
-                        .pathMatchers(HttpMethod.GET, "/api/secondary-markets/active-markets").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtDecoder(jwtDecoder())));

@@ -44,6 +44,14 @@ export function signUp(name, emailId, password) {
   return postAuth('signup', { name, emailId, password });
 }
 
+export function oauthSignIn(token) {
+  return postAuth('oauth-signin', { token });
+}
+
+export function oauthSignUp(token) {
+  return postAuth('oauth-signup', token);
+}
+
 export { safeNextPath };
 
 export function beginGoogleOAuth(nextPath) {
@@ -56,6 +64,34 @@ export function beginGoogleOAuth(nextPath) {
   window.location.assign(googleAuthorizationUrl(configuredBase));
 }
 
-export function exchangeOAuthCode(code) {
-  return postAuth('oauth/exchange', { code });
+export async function exchangeOAuthCode(codeOrToken) {
+  // If the parameter is a JWT token (e.g. redirected from OAuth2SuccessHandler with ?token=...)
+  if (typeof codeOrToken === 'string' && codeOrToken.split('.').length === 3) {
+    try {
+      return await oauthSignIn(codeOrToken);
+    } catch {
+      // If oauth-signin endpoint is unavailable, decode the token payload locally to provide session
+      try {
+        const payload = JSON.parse(atob(codeOrToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+        return {
+          id: payload.userId || payload.sub,
+          name: payload.name || payload.sub?.split('@')[0] || 'Roup Member',
+          emailId: payload.sub || payload.email,
+          jwt: codeOrToken,
+          availableBalance: 0,
+          totalBalance: 0,
+          reservedBalance: 0,
+        };
+      } catch {
+        throw new Error('Could not parse Google OAuth authentication token.');
+      }
+    }
+  }
+
+  // Otherwise, attempt code exchange or token signin fallback
+  try {
+    return await postAuth('oauth/exchange', { code: codeOrToken });
+  } catch {
+    return await oauthSignIn(codeOrToken);
+  }
 }

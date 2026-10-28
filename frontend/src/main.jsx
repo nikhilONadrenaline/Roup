@@ -85,12 +85,22 @@ function App() {
     setSession(nextSession);
   };
 
+  const updateUser = (patch) => {
+    setSession((prev) => {
+      if (!prev) return null;
+      const nextUser = { ...prev.user, ...patch };
+      const nextSession = { ...prev, user: nextUser };
+      sessionStorage.setItem('roup-auth-session', JSON.stringify(nextSession));
+      return nextSession;
+    });
+  };
+
   const signOut = () => {
     try { sessionStorage.removeItem('roup-auth-session'); } catch { /* Clear the in-memory session regardless. */ }
     setSession(null);
   };
 
-  const auth = { session, authenticate, signOut };
+  const auth = { session, authenticate, signOut, updateUser };
   const authPath = currentPath === '/login' || currentPath === '/signup' || (isProtectedPath && !session);
   const protectedPage = currentPath === '/explore' ? <ExplorePage />
     : currentPath === '/markets' || currentPath.startsWith('/markets/') ? <MarketsPage path={currentPath} />

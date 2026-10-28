@@ -2,7 +2,6 @@ package com.backend.Auth_Svc.Config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -43,7 +42,6 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             OAuth2SuccessHandler oAuth2SuccessHandler,
-            OAuth2FailureHandler oAuth2FailureHandler,
             ObjectProvider<ClientRegistrationRepository> clientRegistrations
     ) throws Exception {
 
@@ -51,7 +49,7 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
@@ -59,7 +57,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/api/signup/**",
-                                "/api/oauth/exchange",
+                                "/api/oauth-signin",
+                                "/api/oauth-signup",
                                 "/api/signin/**",
                                 "/oauth2/**",
                                 "/swagger-resources/**",
@@ -72,7 +71,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         if (clientRegistrations.getIfAvailable() != null) {
-            http.oauth2Login(oauth -> oauth.successHandler(oAuth2SuccessHandler).failureHandler(oAuth2FailureHandler));
+            http.oauth2Login(oauth -> oauth.successHandler(oAuth2SuccessHandler));
         }
         return http.build();
     }
@@ -96,12 +95,12 @@ public class SecurityConfig {
 
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(@Value("${app.frontend-base-url}") String frontendBaseUrl) {
+    public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173", "http://localhost:8080", frontendBaseUrl)
+                List.of("http://localhost:5173", "http://localhost:8080","https://khushi-2006yadav.github.io/Arovia/")
         );
 
         configuration.setAllowedMethods(

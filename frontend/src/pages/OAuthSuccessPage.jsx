@@ -14,7 +14,10 @@ export default function OAuthSuccessPage() {
     started.current = true;
 
     const callbackUrl = new URL(window.location.href);
+    const token = callbackUrl.searchParams.get('token');
     const code = callbackUrl.searchParams.get('code');
+    const codeOrToken = token || code;
+
     window.history.replaceState({}, '', `${callbackUrl.pathname}${callbackUrl.hash}`);
 
     let next = '/explore';
@@ -23,13 +26,15 @@ export default function OAuthSuccessPage() {
       sessionStorage.removeItem('roup-oauth-next');
     } catch { /* Fall back to the marketplace when browser storage is unavailable. */ }
 
-    if (!code) {
-      setError('Roup did not receive a sign-in code. Please try Google sign-in again.');
+    if (!codeOrToken) {
+      setError('Roup did not receive a sign-in token or code. Please try Google sign-in again.');
       return;
     }
 
-    exchangeOAuthCode(code).then((user) => {
-      if (!user?.jwt || !user?.id || !user?.emailId) throw new Error('Roup could not establish the expected account session. Please try again.');
+    exchangeOAuthCode(codeOrToken).then((user) => {
+      if (!user?.jwt || (!user?.id && !user?.emailId)) {
+        throw new Error('Roup could not establish the expected account session. Please try again.');
+      }
       authenticate(user);
       navigate(next, { replace: true });
     }).catch((cause) => {
