@@ -1,0 +1,27 @@
+const baseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '');
+
+export async function apiRequest(path, { method = 'GET', body, auth = true } = {}) {
+  const headers = { Accept: 'application/json' };
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (auth) {
+    try {
+      const session = JSON.parse(sessionStorage.getItem('roup-auth-session') || 'null');
+      if (session?.jwt) headers.Authorization = `Bearer ${session.jwt}`;
+    } catch { /* A missing session is handled by the API response. */ }
+  }
+  let response;
+  try {
+    response = await fetch(`${baseUrl}${path}`, { method, headers, ...(body === undefined ? {} : { body: JSON.stringify(body) }) });
+  } catch {
+    throw new Error('The Roup API could not be reached. Check that the backend is running and try again.');
+  }
+  const raw = await response.text();
+  let data = null;
+  if (raw) { try { data = JSON.parse(raw); } catch { data = raw; } }
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) throw new Error('Your session is no longer authorized. Please sign in again.');
+    const message = typeof data === 'string' ? data : data?.detail || data?.message || data?.error;
+    throw new Error(message || `The API request failed (${response.status}).`);
+  }
+  return data;
+}

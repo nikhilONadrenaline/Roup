@@ -13,6 +13,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -60,36 +61,31 @@ public class UserService {
 
         User user = userRepository.findByEmailId(signinDto.getEmailId());
 
-        return mapToUserResponseDto(user, jwtService.generateToken(signinDto.getEmailId(), user.getId()));
+        return responseFor(user, jwtService.generateToken(signinDto.getEmailId(), user.getId()));
     }
 
-    public UserResponseDto oauthLoginUser(String token) {
-        String emailId = jwtService.extractUsername(token);
-        User user = userRepository.findByEmailId(emailId);
-
-        if (user == null) {
-            log.error("Account doesn't exist for email id : {}", emailId);
-            throw new BadCredentialsException("User not found");
+    public User findOrCreateOAuthUser(String email, String name, String avatar) {
+        User existing = userRepository.findByEmailId(email);
+        if (existing != null) return existing;
+        User user = new User();
+        user.setEmailId(email);
+        user.setName(name == null || name.isBlank() ? email.substring(0, email.indexOf('@')) : name);
+        user.setAvatar(avatar);
+        user.setExpertStatus(ExpertStatus.NOT_REGISTERED);
+        user.setTotalBalance(BigDecimal.ZERO);
+        user.setAvailableBalance(BigDecimal.ZERO);
+        user.setReservedBalance(BigDecimal.ZERO);
+        user.setCreatedAt(LocalDateTime.now());
+        try {
+            return userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException concurrentCreate) {
+            User winner = userRepository.findByEmailId(email);
+            if (winner != null) return winner;
+            throw concurrentCreate;
         }
-
-        return mapToUserResponseDto(user, token);
     }
 
-    public UserResponseDto oauthAddUser(String oAuthToken) {
-        String emailId = jwtService.extractUsername(oAuthToken);
-        User user = userRepository.findByEmailId(emailId);
-
-        if (user == null) {
-            log.error("Account doesn't exist for email id : {}", emailId);
-            throw new BadCredentialsException("Email Id not registered");
-        }
-
-        userRepository.save(user);
-
-        return mapToUserResponseDto(user, oAuthToken);
-    }
-
-    private UserResponseDto mapToUserResponseDto(User user, String token) {
+    public UserResponseDto responseFor(User user, String token) {
         UserResponseDto response = new UserResponseDto();
 
         response.setId(user.getId());

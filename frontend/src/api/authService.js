@@ -1,4 +1,7 @@
+import { googleAuthorizationUrl, safeNextPath } from './oauthNavigation.js';
+
 const configuredBase = (import.meta.env.VITE_AUTH_API_BASE_URL || '').trim().replace(/\/$/, '');
+export const googleOAuthEnabled = import.meta.env.VITE_GOOGLE_OAUTH_ENABLED === 'true';
 
 async function postAuth(path, body) {
   let response;
@@ -39,4 +42,20 @@ export function signIn(emailId, password) {
 export function signUp(name, emailId, password) {
   // SignupDto accepts exactly these fields; confirmation stays in the browser.
   return postAuth('signup', { name, emailId, password });
+}
+
+export { safeNextPath };
+
+export function beginGoogleOAuth(nextPath) {
+  if (!googleOAuthEnabled) throw new Error('Google sign-in is not configured for this Roup deployment.');
+  try {
+    sessionStorage.setItem('roup-oauth-next', safeNextPath(nextPath));
+  } catch {
+    throw new Error('Roup could not save your sign-in destination. Check your browser settings and try again.');
+  }
+  window.location.assign(googleAuthorizationUrl(configuredBase));
+}
+
+export function exchangeOAuthCode(code) {
+  return postAuth('oauth/exchange', { code });
 }

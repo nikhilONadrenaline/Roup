@@ -11,7 +11,7 @@ spring:
           '[/**]':
             allowedOrigins:
               - "http://localhost:5173"
-              - "https://khushi-2006yadav.github.io/Arovia"
+              - "${FRONTEND_BASE_URL:http://localhost:5173}"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
@@ -19,7 +19,17 @@ spring:
         - id: auth-route
           uri: lb://auth-service
           predicates:
-            - Path=/api/signup/**, /api/signin/**, /api/oauth-signin, /oauth2/**, /login/**
+            - Path=/api/signup/**, /api/signin/**, /api/oauth/exchange, /oauth2/**, /login/**
+
+        - id: secondary-market-route
+          uri: lb://auction-service
+          predicates:
+            - Path=/api/secondary-markets/**
+
+        - id: dutch-auction-route
+          uri: lb://auction-service
+          predicates:
+            - Path=/api/dutch-auctions/**
 
         - id: user-route
           uri: lb://user-service

@@ -5,10 +5,9 @@ import AuthPages from './pages/AuthPages.jsx';
 import { AuthContext, NavigationContext, ThemeContext } from './store/appContext.js';
 import ExplorePage from './pages/ExplorePage.jsx';
 import { AuctionsPage, ListingsPage, MarketsPage, OrdersPage, WatchlistPage } from './pages/MarketplacePages.jsx';
-import { DemoDataProvider } from './store/demoDataStore.jsx';
 import LandingPage from './pages/LandingPage.jsx';
+import OAuthSuccessPage from './pages/OAuthSuccessPage.jsx';
 import './styles/theme.css';
-import './styles/demoFeatures.css';
 import './styles/readability.css';
 
 function readSession() {
@@ -33,6 +32,10 @@ function App() {
   const [session, setSession] = useState(readSession);
   const [notice, setNotice] = useState('');
   const [theme, setTheme] = useState(() => document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+
+  useEffect(() => {
+    try { localStorage.removeItem('roup-frontend-demo-v1'); } catch { /* Legacy marketplace data is never used by the app. */ }
+  }, []);
 
   useEffect(() => {
     const onPopState = () => setPath(`${window.location.pathname}${window.location.search}`);
@@ -97,8 +100,8 @@ function App() {
           : currentPath === '/listings' ? <ListingsPage /> : null;
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}><AuthContext.Provider value={auth}><NavigationContext.Provider value={navigate}>
-    {authPath ? <AuthPages path={isProtectedPath ? '/login' : currentPath} /> : protectedPage || <LandingPage session={session} notice={notice} onDismissNotice={() => setNotice('')} />}
+    {currentPath === '/oauth-success' ? <OAuthSuccessPage /> : authPath ? <AuthPages path={isProtectedPath ? '/login' : currentPath} /> : protectedPage || <LandingPage session={session} notice={notice} onDismissNotice={() => setNotice('')} />}
   </NavigationContext.Provider></AuthContext.Provider></ThemeContext.Provider>;
 }
 
-createRoot(document.getElementById('root')).render(<React.StrictMode><DemoDataProvider><App /></DemoDataProvider></React.StrictMode>);
+createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>);
