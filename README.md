@@ -4,6 +4,44 @@ A secure, high-performance secondary marketplace for limited-edition festival ti
 
 This project is built using a robust microservice architecture to handle continuous trading, multiple auction formats, secure escrow, and real-time order book updates.
 
+## 🚀 Local Deployment
+
+### Prerequisites
+- **JDK 21** installed and configured.
+- **Node.js and npm** installed.
+- **IntelliJ IDEA** or any suitable IDE for running the backend services.
+- Required database and infrastructure services configured.
+
+### Steps to Run
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd <repository-folder>
+   ```
+
+2. **Set up the frontend**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+3. **Configure the backend**
+
+   Open the backend services in IntelliJ IDEA or another suitable IDE. Configure the required environment variables and database connections in the application configuration files.
+
+4. **Run the backend services**
+
+   Start the required Spring Boot microservices individually. **User-Svc is currently under development and does not need to be started.**
+
+5. **Access the application**
+
+   Open the local URL displayed in the frontend terminal, typically `http://localhost:5173`.
+
+### Notes
+- Ensure all required infrastructure services, such as PostgreSQL, Redis, and the service registry, are running and accessible before starting the dependent microservices.
+- Configure the appropriate environment variables and credentials before running the application.
 
 ## 🚀 Live Deployments
 
@@ -32,11 +70,11 @@ The application is currently live and deployed across Vercel (Frontend) and Rend
 * **Databases:** PostgreSQL (Relational), MongoDB (Document), Redis (Caching & Streams)
 
 ### Frontend
-* **Core:** React, Vite, TypeScript
+* **Core:** React, Vite, JavaScript
 * **Real-time:** Native browser WebSocket API
 
 ### Infrastructure
-* Docker & Docker Compose
+* Docker 
 * API Gateway pattern with service discovery
 
 ---
@@ -51,7 +89,6 @@ The platform is strictly separated by domain responsibilities to ensure data int
 | **Eureka Server** | N/A | Dynamic service discovery and registry. |
 | **Auth Service** | PostgreSQL | Registration, login, secure password hashing, and JWT lifecycle. |
 | **User Service** | PostgreSQL | User profiles, account status, and preferences. |
-| **Expert Service** | PostgreSQL | Expert valuations, qualification profiles, and report reviews. |
 | **Auction Service** | MongoDB + Redis | Core matching engine. Handles continuous order books, limit/market orders, and auction lifecycles. |
 | **Orders Service** | PostgreSQL/Mongo | Post-trade fulfillment workflow, escrow coordination, claim-token generation, and disputes. |
 | **Wallet Service** | PostgreSQL | Financial domain owner. Manages available/reserved balances and the double-entry ledger. |
@@ -63,11 +100,9 @@ The platform is strictly separated by domain responsibilities to ensure data int
 ### 1. Continuous Limit/Market Order Book
 The core trading mechanism matching buyers and sellers using FIFO price-time priority. Unfilled limit orders rest in the continuous book while market orders execute immediately against the best available price.
 
-### 2. Supported Auction Formats
-* **English Auction:** Ascending-price format with progressive bidding.
+### 2. Supported Auction/Market Formats
+* **Secondary-Marketplace:** Ticket/Relic trading platform with in-memory matching, real-time depth charts via WebSockets.
 * **Dutch Auction:** Descending-price schedule until an eligible buyer accepts atomically.
-* **Sealed-Bid First-Price:** Confidential bids with the highest bidder paying their submitted bid.
-* **Sealed-Bid Second-Price (Vickrey):** Confidential bids where the winner pays the second-highest bid.
 
 ### 3. Financial Safety & Escrow
 * **Wallet Reservations:** Balances are split into `Available` and `Reserved`. Funds are reserved (not immediately transferred) upon placing bids or limit orders.
@@ -76,7 +111,7 @@ The core trading mechanism matching buyers and sellers using FIFO price-time pri
 
 ### 4. Anti-Scalping & Bot Protection
 * **Price Collars:** Configurable resale maximums based on original face value multipliers.
-* **System Safeguards:** Idempotency keys, rate limits, bounded queues, and real-time abuse monitoring.
+* **System Safeguards:** Idempotency keys, rate limits and bounded queues.
 
 ---
 
