@@ -5,8 +5,8 @@ services:
     plan: free
     region: singapore
     rootDir: backend/eureka-server
-    dockerfilePath: backend/eureka-server/Dockerfile
-    dockerContext: backend/eureka-server
+    dockerfilePath: Dockerfile
+    dockerContext: .
 
   - type: web
     name: roup-auth
@@ -14,8 +14,8 @@ services:
     plan: free
     region: singapore
     rootDir: backend/Auth-Svc
-    dockerfilePath: backend/Auth-Svc/Dockerfile
-    dockerContext: backend/Auth-Svc
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: AUTH_DATABASE_URL
         sync: false
@@ -44,8 +44,8 @@ services:
     plan: free
     region: singapore
     rootDir: backend/User-Svc
-    dockerfilePath: backend/User-Svc/Dockerfile
-    dockerContext: backend/User-Svc
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: USER_DATABASE_URL
         sync: false
@@ -66,8 +66,8 @@ services:
     plan: free
     region: singapore
     rootDir: backend/Wallet-Svc
-    dockerfilePath: backend/Wallet-Svc/Dockerfile
-    dockerContext: backend/Wallet-Svc
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: WALLET_DATABASE_URL
         sync: false
@@ -90,8 +90,8 @@ services:
     plan: free
     region: singapore
     rootDir: backend/Auction-Svc
-    dockerfilePath: backend/Auction-Svc/Dockerfile
-    dockerContext: backend/Auction-Svc
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: MONGODB_URI
         sync: false
@@ -114,8 +114,8 @@ services:
     plan: free
     region: singapore
     rootDir: backend/Order-Svc
-    dockerfilePath: backend/Order-Svc/Dockerfile
-    dockerContext: backend/Order-Svc
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: REDIS_URL
         sync: false
@@ -136,8 +136,8 @@ services:
     plan: free
     region: singapore
     rootDir: backend/api-gateway
-    dockerfilePath: backend/api-gateway/Dockerfile
-    dockerContext: backend/api-gateway
+    dockerfilePath: Dockerfile
+    dockerContext: .
     envVars:
       - key: REDIS_URL
         sync: false
