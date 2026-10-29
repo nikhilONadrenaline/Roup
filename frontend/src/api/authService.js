@@ -1,7 +1,7 @@
 import { googleAuthorizationUrl, safeNextPath } from './oauthNavigation.js';
 
 export function getAuthBase() {
-  const envBase = (import.meta.env.VITE_AUTH_API_BASE_URL || '').trim().replace(/\/$/, '');
+  const envBase = (import.meta.env.VITE_AUTH_API_BASE_URL || import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '');
   // On localhost use relative paths ('') so requests go through Vite's dev proxy (no CORS issues).
   if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     return '';

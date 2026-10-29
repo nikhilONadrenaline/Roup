@@ -1,13 +1,12 @@
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 spring:
   application:
     name: api-gateway
   data:
     redis:
-      host: localhost
-      port: 6379
+      url: ${REDIS_URL:redis://localhost:6379}
 
   cloud:
     gateway:
@@ -17,8 +16,8 @@ spring:
             cors-configurations:
               '[/**]':
                 allowedOrigins:
+                  - "${FRONTEND_ORIGIN:http://localhost:5173}"
                   - "http://localhost:5173"
-                  - "https://khushi-2006yadav.github.io/Arovia"
                 allowedMethods: "*"
                 allowedHeaders: "*"
                 allowCredentials: true
@@ -112,7 +111,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_SERVER_URL:http://${EUREKA_SERVER_HOSTPORT:localhost:8761}/eureka/}
   instance:
     prefer-ip-address: true
 
@@ -159,4 +158,4 @@ resilience4j:
         baseConfig: default
 
 jwt:
-  secret: "ThisIsASuperSecretKeyForJwtAuthentication123456"
+  secret: ${JWT_SECRET:ThisIsASuperSecretKeyForJwtAuthentication123456}

@@ -1,0 +1,152 @@
+services:
+  - type: web
+    name: roup-eureka
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: backend/eureka-server
+    dockerfilePath: backend/eureka-server/Dockerfile
+    dockerContext: backend/eureka-server
+
+  - type: web
+    name: roup-auth
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: backend/Auth-Svc
+    dockerfilePath: backend/Auth-Svc/Dockerfile
+    dockerContext: backend/Auth-Svc
+    envVars:
+      - key: AUTH_DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FRONTEND_ORIGIN
+        value: https://roup-eight.vercel.app
+      - key: EUREKA_SERVER_HOSTPORT
+        fromService:
+          type: web
+          name: roup-eureka
+          property: hostport
+      - key: EUREKA_INSTANCE_HOSTNAME
+        fromService:
+          type: web
+          name: roup-auth
+          property: host
+
+  - type: web
+    name: roup-user
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: backend/User-Svc
+    dockerfilePath: backend/User-Svc/Dockerfile
+    dockerContext: backend/User-Svc
+    envVars:
+      - key: USER_DATABASE_URL
+        sync: false
+      - key: EUREKA_SERVER_HOSTPORT
+        fromService:
+          type: web
+          name: roup-eureka
+          property: hostport
+      - key: EUREKA_INSTANCE_HOSTNAME
+        fromService:
+          type: web
+          name: roup-user
+          property: host
+
+  - type: web
+    name: roup-wallet
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: backend/Wallet-Svc
+    dockerfilePath: backend/Wallet-Svc/Dockerfile
+    dockerContext: backend/Wallet-Svc
+    envVars:
+      - key: WALLET_DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: EUREKA_SERVER_HOSTPORT
+        fromService:
+          type: web
+          name: roup-eureka
+          property: hostport
+      - key: EUREKA_INSTANCE_HOSTNAME
+        fromService:
+          type: web
+          name: roup-wallet
+          property: host
+
+  - type: web
+    name: roup-auction
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: backend/Auction-Svc
+    dockerfilePath: backend/Auction-Svc/Dockerfile
+    dockerContext: backend/Auction-Svc
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: EUREKA_SERVER_HOSTPORT
+        fromService:
+          type: web
+          name: roup-eureka
+          property: hostport
+      - key: EUREKA_INSTANCE_HOSTNAME
+        fromService:
+          type: web
+          name: roup-auction
+          property: host
+
+  - type: web
+    name: roup-orders
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: backend/Order-Svc
+    dockerfilePath: backend/Order-Svc/Dockerfile
+    dockerContext: backend/Order-Svc
+    envVars:
+      - key: REDIS_URL
+        sync: false
+      - key: EUREKA_SERVER_HOSTPORT
+        fromService:
+          type: web
+          name: roup-eureka
+          property: hostport
+      - key: EUREKA_INSTANCE_HOSTNAME
+        fromService:
+          type: web
+          name: roup-orders
+          property: host
+
+  - type: web
+    name: roup-gateway
+    runtime: docker
+    plan: free
+    region: singapore
+    rootDir: backend/api-gateway
+    dockerfilePath: backend/api-gateway/Dockerfile
+    dockerContext: backend/api-gateway
+    envVars:
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_ORIGIN
+        value: https://roup-eight.vercel.app
+      - key: EUREKA_SERVER_HOSTPORT
+        fromService:
+          type: web
+          name: roup-eureka
+          property: hostport

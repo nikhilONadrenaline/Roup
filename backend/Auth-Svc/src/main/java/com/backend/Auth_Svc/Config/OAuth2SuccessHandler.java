@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -25,6 +26,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     @Autowired
     private JWTService jwtService;
+
+    @Value("${frontend.origin:http://localhost:5173}")
+    private String frontendOrigin;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -53,7 +57,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String token = jwtService.generateToken(email, user.getId());
 
-        String targetUrl = "https://khushi-2006yadav.github.io/Arovia/oauth-success?token=" + token; // Yaha se frontend me token ko extract karns hoga
+        String targetUrl = frontendOrigin.replaceAll("/$", "") + "/oauth-success?token=" + token;
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

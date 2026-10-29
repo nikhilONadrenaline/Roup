@@ -1,12 +1,12 @@
 server:
-  port: 0
+  port: ${PORT:0}
 
 spring:
   application:
     name: wallet-service
 
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:5432/roup_wallet
+    url: ${WALLET_DATABASE_URL:jdbc:postgresql://${DB_HOST:localhost}:5432/roup_users}
     username: ${DB_USER:postgres}
     password: ${DB_PASS:postgres}
     driver-class-name: org.postgresql.Driver
@@ -17,7 +17,9 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://${EUREKA_HOST:localhost}:8761/eureka/
+      defaultZone: ${EUREKA_SERVER_URL:http://${EUREKA_SERVER_HOSTPORT:localhost:8761}/eureka/}
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    non-secure-port: ${PORT:0}
     instance-id: ${spring.application.name}:${random.uuid}

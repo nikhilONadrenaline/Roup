@@ -2,6 +2,7 @@ package com.backend.Auth_Svc.Config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,9 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${frontend.origin:http://localhost:5173}")
+    private String frontendOrigin;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -100,7 +104,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:5173", "http://localhost:8080","https://khushi-2006yadav.github.io/Arovia/")
+                List.of(frontendOrigin, "http://localhost:5173", "http://localhost:8080")
         );
 
         configuration.setAllowedMethods(

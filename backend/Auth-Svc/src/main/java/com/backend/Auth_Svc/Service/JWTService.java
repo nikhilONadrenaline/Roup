@@ -3,6 +3,7 @@ package com.backend.Auth_Svc.Service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -11,12 +12,12 @@ import java.util.Date;
 
 @Service
 public  class JWTService {
-    private  final String SECRET =
-            "ThisIsASuperSecretKeyForJwtAuthentication123456";
+    @Value("${jwt.secret:ThisIsASuperSecretKeyForJwtAuthentication123456}")
+    private String secret;
     private  SecretKey getSignKey()
     {
 //        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String generateToken(String email,String userId)
